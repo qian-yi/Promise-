@@ -28,6 +28,24 @@
   })
   ```
 
+
+- ```css
+  分支二: 在 Promise 类中加入异步逻辑
+  	1. 执行器立即执行时,是个异步代码的情况,由于主线程不会等待异步代码，因此 then会马上执行
+  	2. then方法里面 我们判断了下当前状态 这时状态是等待，所以我们不清楚何时去调用成功回调或失败回调，因此我们 要将成功回调和失败回调存储起来
+  	3. 等异步结束后，我们再去判断成功回调或失败回调是否存在 如果存在 就调用
   
+  let promise = new Promise((resolve,reject) => {
+    setTimeout(() => {
+      resolve('成功');
+    },2000)
+    /* reject('失败'); */
+  });
+  promise.then(value => {
+    console.log(value);
+  },reason => {
+    console.log(reason);
+  })
+  ```
 
   
