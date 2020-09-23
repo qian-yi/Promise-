@@ -41,6 +41,28 @@
     },2000)
     /* reject('失败'); */
   });
+  ```
+  
+- ```css
+  分支三：实现 then 方法多次调用添加多个处理函数
+  	1. 同一个 Promise 对象上的 then 方法是可以被多次调用的
+    2. 当状态变成成功或者失败时，then里面所对应的函数是要被依次调用的
+    3. 是同步的话，依次调用就行
+    	 是异步的情况 我们需要把状态先用数组存储起来
+  	4. 当状态变为成功或失败时 通过循环依次调用其对应的回调函数
+  
+  let promise = new Promise((resolve,reject) => {
+    setTimeout(() => {
+      resolve('成功');
+    },2000)
+    /* reject('失败'); */
+  });
+  promise.then(value => {
+    console.log(value);
+  },reason => {
+    console.log(reason);
+  })
+  
   promise.then(value => {
     console.log(value);
   },reason => {
