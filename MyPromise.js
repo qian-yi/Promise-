@@ -54,7 +54,12 @@ class MyPromise {
       if(this.status === FULFILLED) {
         // 拿到成功回调的返回值
         let x = successCallback(this.value);
-        resolve(x);
+        /* 
+          判断x的值是普通值还是 promise 对象
+            普通值：直接调用 resolve
+            promise对象：查看promise对象返回的结果，再根据结果 决定调用 resolve 还是 reject
+        */
+        resolvePromise(x,resolve,reject);
       }else if(this.status === REJECTED) {
         failCallback(this.reason);
       }else {
@@ -68,6 +73,19 @@ class MyPromise {
   }
 }
 
+function resolvePromise(x,resolve,reject) {
+  // 判断 x是否是MyPromise 的实例
+  if(x instanceof MyPromise) {
+    // promise对象
+    // x.then(value => resolve(value),reason => reject(reason));
+    // => 简化
+    x.then(resolve,reject);
+  }else {
+    // 普通值
+    resolve(x);
+  }
+}
+
 module.exports = MyPromise;
 
 let promise = new Promise((resolve,reject) => {
@@ -77,9 +95,14 @@ let promise = new Promise((resolve,reject) => {
   /* reject('失败'); */
 });
 
+function other() {
+  return new MyPromise((resolve,reject) => {
+    resolve('other');
+  })
+}
 promise.then(value => {
   console.log(value);
-  return 100;
+  return other();
 }).then(value => {
   console.log(value);
 })
