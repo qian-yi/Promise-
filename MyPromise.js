@@ -49,17 +49,22 @@ class MyPromise {
     while(this.failCallback.length) this.failCallback.shift()(this.reason);
   }
   then(successCallback,failCallback) {
-    // 判断状态
-    if(this.status === FULFILLED) {
-      successCallback(this.value);
-    }else if(this.status === REJECTED) {
-      failCallback(this.reason);
-    }else {
-      // 等待状态
-      // 将成功回调和失败回调存储起来
-      this.successCallback.push(successCallback);
-      this.failCallback.push(failCallback);
-    }
+    let promise2 = new MyPromise((resolve,reject) => {
+      // 判断状态
+      if(this.status === FULFILLED) {
+        // 拿到成功回调的返回值
+        let x = successCallback(this.value);
+        resolve(x);
+      }else if(this.status === REJECTED) {
+        failCallback(this.reason);
+      }else {
+        // 等待状态
+        // 将成功回调和失败回调存储起来
+        this.successCallback.push(successCallback);
+        this.failCallback.push(failCallback);
+      }
+    });
+    return promise2;
   }
 }
 
@@ -74,18 +79,7 @@ let promise = new Promise((resolve,reject) => {
 
 promise.then(value => {
   console.log(value);
-},reason => {
-  console.log(reason);
-})
-
-promise.then(value => {
+  return 100;
+}).then(value => {
   console.log(value);
-},reason => {
-  console.log(reason);
-})
-
-promise.then(value => {
-  console.log(value);
-},reason => {
-  console.log(reason);
 })
