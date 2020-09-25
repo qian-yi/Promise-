@@ -53,6 +53,8 @@ class MyPromise {
     while(this.failCallback.length) this.failCallback.shift()();
   }
   then(successCallback,failCallback) {
+    successCallback = successCallback ? successCallback : value => value;
+    failCallback = failCallback ? failCallback : reason => { throw reason };
     let promise2 = new MyPromise((resolve,reject) => {
       // 判断状态
       if(this.status === FULFILLED) {
@@ -107,6 +109,36 @@ class MyPromise {
     });
     return promise2;
   }
+  static all(array) {
+    // 用来存放结果的数组
+    let result = [];
+    let index = 0;
+    return new MyPromise((resolve,reject) => {
+      function addData(key,value) {
+        result[key] = value;
+        index++;
+        /* 
+          因为参数有可能有异步状态
+          等待所有异步操作完成后才能调用resolve方法 
+        */
+        if(index === array.length) {
+          resolve(result);
+        }
+      }
+
+      for (let i = 0,len = array.length; i < len; i++) {
+        let current = array[i];
+        // 判断 current是否是MyPromise 的实例
+        if(current instanceof MyPromise) {
+          // promise对象
+          current.then(value => addData(i,value),reject);
+        }else {
+          // 普通值
+          addData(i,current);
+        }
+      }
+    })
+  }
 }
 
 function resolvePromise(promise2,x,resolve,reject) {
@@ -127,22 +159,20 @@ function resolvePromise(promise2,x,resolve,reject) {
 
 module.exports = MyPromise;
 
-let promise = new MyPromise((resolve,reject) => {
-  setTimeout(() => {
-    resolve('成功.......');
-  },2000);
-  // throw new Error('exectur error');
-  // resolve('成功');
-  // reject('失败');
-});
+function p1() {
+  return new MyPromise((resolve,reject) => {
+    setTimeout(() => {
+      resolve('p1');
+    },2000);
+  })
+}
 
-let p1 = promise.then(value => {
-  console.log(value);
-  // throw new Error('then error');
-  return 'aaaa';
-},reason => {
-  console.log(reason);
-  return 10000;
-}).then(value => {
-  console.log(value);
+function p2() {
+  return new MyPromise((resolve,reject) => {
+    resolve('p2');
+  })
+}
+
+MyPromise.all(['a','b',p1(),p2(),'c']).then(result => {
+  console.log(result); // => ['a','b','p1','p2','c']
 })
