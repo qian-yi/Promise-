@@ -53,6 +53,8 @@ class MyPromise {
     while(this.failCallback.length) this.failCallback.shift()();
   }
   then(successCallback,failCallback) {
+    successCallback = successCallback ? successCallback : value => value;
+    failCallback = failCallback ? failCallback : reason => { throw reason };
     let promise2 = new MyPromise((resolve,reject) => {
       // 判断状态
       if(this.status === FULFILLED) {
@@ -109,7 +111,7 @@ class MyPromise {
   }
 }
 
-function resolvePromise(x,resolve,reject) {
+function resolvePromise(promise2,x,resolve,reject) {
   if(promise2 === x) {
     return reject(new TypeError('Chaining cycle detected for promise #<Promise>'));
   }
@@ -127,22 +129,20 @@ function resolvePromise(x,resolve,reject) {
 
 module.exports = MyPromise;
 
-let promise = new Promise((resolve,reject) => {
-  setTimeout(() => {
+let promise = new MyPromise((resolve,reject) => {
+  /* setTimeout(() => {
     resolve('成功.......');
-  },2000);
+  },2000); */
   // throw new Error('exectur error');
   // resolve('成功');
-  // reject('失败');
+  reject('失败');
 });
 
-let p1 = promise.then(value => {
-  console.log(value);
-  // throw new Error('then error');
-  return 'aaaa';
-},reason => {
-  console.log(reason);
-  return 10000;
-}).then(value => {
-  console.log(value);
-})
+promise
+  .then()
+  .then()
+  .then(value => {
+    console.log(value)
+  },reason => {
+    console.log(reason);
+  })
