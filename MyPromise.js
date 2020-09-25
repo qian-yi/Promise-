@@ -52,14 +52,17 @@ class MyPromise {
     let promise2 = new MyPromise((resolve,reject) => {
       // 判断状态
       if(this.status === FULFILLED) {
-        // 拿到成功回调的返回值
-        let x = successCallback(this.value);
-        /* 
-          判断x的值是普通值还是 promise 对象
-            普通值：直接调用 resolve
-            promise对象：查看promise对象返回的结果，再根据结果 决定调用 resolve 还是 reject
-        */
-        resolvePromise(x,resolve,reject);
+        // 为了获得返回的 promise2对象 将代码变成异步代码
+        setTimeout(() => {
+          // 拿到成功回调的返回值
+          let x = successCallback(this.value);
+          /* 
+            判断x的值是普通值还是 promise 对象
+              普通值：直接调用 resolve
+              promise对象：查看promise对象返回的结果，再根据结果 决定调用 resolve 还是 reject
+          */
+          resolvePromise(promise2,x,resolve,reject);
+        },0);
       }else if(this.status === REJECTED) {
         failCallback(this.reason);
       }else {
@@ -74,6 +77,9 @@ class MyPromise {
 }
 
 function resolvePromise(x,resolve,reject) {
+  if(promise2 === x) {
+    return reject(new TypeError('Chaining cycle detected for promise #<Promise>'));
+  }
   // 判断 x是否是MyPromise 的实例
   if(x instanceof MyPromise) {
     // promise对象
@@ -89,20 +95,14 @@ function resolvePromise(x,resolve,reject) {
 module.exports = MyPromise;
 
 let promise = new Promise((resolve,reject) => {
-  setTimeout(() => {
-    resolve('成功');
-  },2000)
+  resolve('成功');
   /* reject('失败'); */
 });
 
-function other() {
-  return new MyPromise((resolve,reject) => {
-    resolve('other');
-  })
-}
-promise.then(value => {
+let p1 = promise.then(value => {
   console.log(value);
-  return other();
-}).then(value => {
-  console.log(value);
+  return p1;
+})
+p1.then(() => {},reason => {
+  console.log(reason.message);
 })

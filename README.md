@@ -84,4 +84,9 @@
           promise对象：查看promise对象返回的结果，再根据结果 决定调用 resolve 还是 reject
   ```
 
+- ```css
+  分支六：then 方法链式调用识别 Promise 对象自返回
+  	1. 如果then 方法返回的是当前then方法放回的promise 对象，就会发生 Promise的循环调用，程序会不报错
+  ```
+
   
