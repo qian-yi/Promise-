@@ -109,7 +109,7 @@ class MyPromise {
   }
 }
 
-function resolvePromise(x,resolve,reject) {
+function resolvePromise(promise2,x,resolve,reject) {
   if(promise2 === x) {
     return reject(new TypeError('Chaining cycle detected for promise #<Promise>'));
   }
@@ -127,7 +127,7 @@ function resolvePromise(x,resolve,reject) {
 
 module.exports = MyPromise;
 
-let promise = new Promise((resolve,reject) => {
+let promise = new MyPromise((resolve,reject) => {
   setTimeout(() => {
     resolve('成功.......');
   },2000);
