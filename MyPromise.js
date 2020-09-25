@@ -5,7 +5,11 @@ const REJECTED = 'rejected'; // 失败
 
 class MyPromise {
   constructor(exectur) { // 执行器
-    exectur(this.resolve,this.reject);
+    try {
+      exectur(this.resolve,this.reject);
+    } catch (error) {
+      this.reject(error);
+    }
   }
   /* 
     Promise 状态是每一个 Promise 独有的,所以我们定义为实例属性
@@ -35,7 +39,7 @@ class MyPromise {
     this.value = value;
     // 判断成功回调是否存在 如果存在 就调用
     // this.successCallback && this.successCallback(this.value);
-    while(this.successCallback.length) this.successCallback.shift()(this.value);
+    while(this.successCallback.length) this.successCallback.shift()();
   }
   reject = reason => {
     // 如果状态不是等待,阻止程序向下执行
@@ -46,7 +50,7 @@ class MyPromise {
     this.reason = reason;
     // 判断失败回调是否存在 如果存在 就调用
     // this.failCallback && this.failCallback(this.reason);
-    while(this.failCallback.length) this.failCallback.shift()(this.reason);
+    while(this.failCallback.length) this.failCallback.shift()();
   }
   then(successCallback,failCallback) {
     let promise2 = new MyPromise((resolve,reject) => {
@@ -54,22 +58,51 @@ class MyPromise {
       if(this.status === FULFILLED) {
         // 为了获得返回的 promise2对象 将代码变成异步代码
         setTimeout(() => {
-          // 拿到成功回调的返回值
-          let x = successCallback(this.value);
-          /* 
-            判断x的值是普通值还是 promise 对象
-              普通值：直接调用 resolve
-              promise对象：查看promise对象返回的结果，再根据结果 决定调用 resolve 还是 reject
-          */
-          resolvePromise(promise2,x,resolve,reject);
+          try {
+            // 拿到成功回调的返回值
+            let x = successCallback(this.value);
+            /* 
+              判断x的值是普通值还是 promise 对象
+                普通值：直接调用 resolve
+                promise对象：查看promise对象返回的结果，再根据结果 决定调用 resolve 还是 reject
+            */
+            resolvePromise(promise2,x,resolve,reject);
+          } catch (error) {
+            reject(error);
+          }
         },0);
       }else if(this.status === REJECTED) {
-        failCallback(this.reason);
+        setTimeout(() => {
+          try {
+            let x = failCallback(this.reason);
+            resolvePromise(promise2,x,resolve,reject);
+          } catch (error) {
+            reject(error);
+          }
+        },0);
       }else {
         // 等待状态
         // 将成功回调和失败回调存储起来
-        this.successCallback.push(successCallback);
-        this.failCallback.push(failCallback);
+        this.successCallback.push(() => {
+          setTimeout(() => {
+            try {
+              let x = successCallback(this.value);
+              resolvePromise(promise2,x,resolve,reject);
+            } catch (error) {
+              reject(error);
+            }
+          },0);
+        });
+        this.failCallback.push(() => {
+          setTimeout(() => {
+            try {
+              let x = failCallback(this.reason);
+              resolvePromise(promise2,x,resolve,reject);
+            } catch (error) {
+              reject(error);
+            }
+          },0);
+        });
       }
     });
     return promise2;
@@ -95,14 +128,21 @@ function resolvePromise(x,resolve,reject) {
 module.exports = MyPromise;
 
 let promise = new Promise((resolve,reject) => {
-  resolve('成功');
-  /* reject('失败'); */
+  setTimeout(() => {
+    resolve('成功.......');
+  },2000);
+  // throw new Error('exectur error');
+  // resolve('成功');
+  // reject('失败');
 });
 
 let p1 = promise.then(value => {
   console.log(value);
-  return p1;
-})
-p1.then(() => {},reason => {
-  console.log(reason.message);
+  // throw new Error('then error');
+  return 'aaaa';
+},reason => {
+  console.log(reason);
+  return 10000;
+}).then(value => {
+  console.log(value);
 })
