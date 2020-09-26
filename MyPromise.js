@@ -109,6 +109,15 @@ class MyPromise {
     });
     return promise2;
   }
+  finally(callback) {
+    // 得到当前 Promise对象的状态
+    return this.then(value => {
+      // 等待 finally中的 Promise对象执行完成后，再返回 value
+      return MyPromise.resolve(callback()).then(() => value);
+    },reason => {
+      return MyPromise.reject(callback()).then(() => { throw reason });
+    })
+  }
   static all(array) {
     // 用来存放结果的数组
     let result = [];
@@ -165,11 +174,23 @@ module.exports = MyPromise;
 
 function p1() {
   return new MyPromise((resolve,reject) => {
-    setTimeout(() => {
-      resolve('p1');
-    },2000);
+   setTimeout(() => {
+     resolve('p1 resolve');
+   },2000);
+  })
+}
+function p2() {
+  return new MyPromise((resolve,reject) => {
+    resolve('p2 resolve');
+    // reject('p2 reject');
   })
 }
 
-MyPromise.resolve(100).then(value => console.log(value));
-MyPromise.resolve(p1()).then(value => console.log(value));
+p2().finally(() => {
+  console.log('finally');
+  return p1();
+}).then(value => {
+  console.log(value);
+},reason => {
+  console.log(reason);
+})

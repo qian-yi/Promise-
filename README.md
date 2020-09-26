@@ -113,8 +113,15 @@
   分支十：Promise.resolve 方法的实现
   	1. 将给定的值转换为Promise 对象
 			普通值：创建一个Promise对象，把给定的值包裹在 Promise 对象中，然后把创建的 Promise对象返回就行
-  			promise对象：原封不动的把这个 Pomise 对象直接返回
+  		promise对象：原封不动的把这个 Pomise 对象直接返回
   ```
   
+- ```css
+  分支十一：finally 方法的实现
+  	1. 无论当前这个 Pomise的状态最终是成功的还是失败的，finally当中的回调函数始终都会被执行一次
+  	2. 在 finally方法的后面，我们可以链式调用 then方法来拿到当前这个 Promise对象最终返回的结果
+  	3. 在finally 回调函数中，可以return一个 Promise 对象，这时得等待这个 Promise对象完成后，下一个 then才能执行
+  ```
+
   
 
