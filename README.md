@@ -123,5 +123,10 @@
   	3. 在finally 回调函数中，可以return一个 Promise 对象，这时得等待这个 Promise对象完成后，下一个 then才能执行
   ```
 
+- ```css
+  分支十二：catch方法的实现
+  	1. 用来处理当前这个 promise对象最终的状态为失败的情况
+  ```
+
   
 

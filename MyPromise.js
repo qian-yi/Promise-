@@ -118,6 +118,9 @@ class MyPromise {
       return MyPromise.reject(callback()).then(() => { throw reason });
     })
   }
+  catch(failCallback) {
+    return this.then(undefined,failCallback);
+  }
   static all(array) {
     // 用来存放结果的数组
     let result = [];
@@ -172,25 +175,16 @@ function resolvePromise(promise2,x,resolve,reject) {
 
 module.exports = MyPromise;
 
-function p1() {
-  return new MyPromise((resolve,reject) => {
-   setTimeout(() => {
-     resolve('p1 resolve');
-   },2000);
-  })
-}
+
 function p2() {
   return new MyPromise((resolve,reject) => {
-    resolve('p2 resolve');
-    // reject('p2 reject');
+    // resolve('p2 resolve');
+    reject('p2 reject');
   })
 }
 
-p2().finally(() => {
-  console.log('finally');
-  return p1();
-}).then(value => {
+p2().then(value => {
   console.log(value);
-},reason => {
+}).catch(reason => {
   console.log(reason);
 })
