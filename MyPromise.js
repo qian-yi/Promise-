@@ -139,6 +139,10 @@ class MyPromise {
       }
     })
   }
+  static resolve(value) {
+    if(value instanceof MyPromise) return value;
+    return new MyPromise(resolve => resolve(value));
+  }
 }
 
 function resolvePromise(promise2,x,resolve,reject) {
@@ -167,12 +171,5 @@ function p1() {
   })
 }
 
-function p2() {
-  return new MyPromise((resolve,reject) => {
-    resolve('p2');
-  })
-}
-
-MyPromise.all(['a','b',p1(),p2(),'c']).then(result => {
-  console.log(result); // => ['a','b','p1','p2','c']
-})
+MyPromise.resolve(100).then(value => console.log(value));
+MyPromise.resolve(p1()).then(value => console.log(value));

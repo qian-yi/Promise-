@@ -109,5 +109,12 @@
   		 有一个是失败的，那么结果就是失败的
   ```
 
+- ```css
+  分支十：Promise.resolve 方法的实现
+  	1. 将给定的值转换为Promise 对象
+			普通值：创建一个Promise对象，把给定的值包裹在 Promise 对象中，然后把创建的 Promise对象返回就行
+  			promise对象：原封不动的把这个 Pomise 对象直接返回
+  ```
+  
   
 
