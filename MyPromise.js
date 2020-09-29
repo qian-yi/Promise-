@@ -151,6 +151,22 @@ class MyPromise {
       }
     })
   }
+  // 只要有一个成功或者失败就返回
+  static race(array) {
+    let promise = new MyPromise((resolve, reject) => {
+      for (let i = 0; i < array.length; i++) {
+        let curr = array[i];
+        // MyPromise实例 结果处理
+        if (curr instanceof MyPromise) {
+          curr.then(resolve, reject);
+        } else {
+          // 非MyPromise实例处理
+          resolve(curr);
+        }
+      }
+    });
+    return promise;
+  }
   static resolve(value) {
     if(value instanceof MyPromise) return value;
     return new MyPromise(resolve => resolve(value));
