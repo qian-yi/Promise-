@@ -155,6 +155,10 @@ class MyPromise {
     if(value instanceof MyPromise) return value;
     return new MyPromise(resolve => resolve(value));
   }
+  static reject(reason) {
+    if(reason instanceof MyPromise) return reason;
+    return new MyPromise((resolve,reject) => reject(reason));
+  }
 }
 
 function resolvePromise(promise2,x,resolve,reject) {
@@ -175,16 +179,6 @@ function resolvePromise(promise2,x,resolve,reject) {
 
 module.exports = MyPromise;
 
-
-function p2() {
-  return new MyPromise((resolve,reject) => {
-    // resolve('p2 resolve');
-    reject('p2 reject');
-  })
-}
-
-p2().then(value => {
-  console.log(value);
-}).catch(reason => {
+MyPromise.reject('失败').then(data => {}, reason => {
   console.log(reason);
 })

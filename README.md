@@ -128,5 +128,10 @@
   	1. 用来处理当前这个 promise对象最终的状态为失败的情况
   ```
 
-  
+- ```css
+  分支十三：Promise.reject方法的实现
+  	1. 将给定的值转换为Promise 对象
+  		普通值：创建一个Promise对象，把给定的值包裹在 Promise 对象中，然后把创建的 Promise对象返回就行
+  		promise对象：原封不动的把这个 Pomise 对象直接返回
+  ```
 
